@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            background-color: #4CAF50;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+            transform: scale(1.1);
+        }
+
+        button:active {
+            background-color: #3e8e41;
+        }
+
+        button:focus {
+            outline: none;
+        }
+
+        #rezultat {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #ddd;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Auto API</h1>
+    <div class="button-container">
+        <button id="buton1">Anunturi</button>
+        <button id="buton2">Statistica user activity</button>
+        <button id="buton3">Masini si Kilometraj</button>
+        <button id="buton4">Detalii auto per user</button>
+    </div>
+
+    <div id="rezultat"></div>
+
+    <script>
+
+        const adrese = {
+            anunturi_cu_useri_si_masini: 'http://localhost:8080/ords/auto/anunturi_cu_useri_si_masini/',
+            car_det: 'http://localhost:8080/ords/auto/car_det/',
+            user_car_det: 'http://localhost:8080/ords/auto/user_car_det/',
+            activity: 'http://localhost:8080/ords/auto/activity/'
+        };
+
+        document.getElementById('buton1').addEventListener('click', () => {
+            fetch(adrese.anunturi_cu_useri_si_masini)
+                .then(response => response.json())
+                .then(data => {
+                    const tabela = document.createElement('table');
+                    tabela.innerHTML = `
+        <tr>
+          <th>Producător</th>
+          <th>Model</th>
+          <th>Kilometraj</th>
+          <th>Capacitate motor</th>
+          <th>Postat de</th>
+          <th>Descriere</th>
+        </tr>
+      `;
+
+                    data.items.forEach(item => {
+                        const rand = document.createElement('tr');
+                        rand.innerHTML = `
+          <td>${item.car_manufacturer}</td>
+          <td>${item.car_model}</td>
+          <td>${item.milage}</td>
+          <td>${item.engine_capacity}</td>
+          <td>${item.posted_by}</td>
+          <td>${item.description}</td>
+        `;
+                        tabela.appendChild(rand);
+                    });
+
+                    document.getElementById('rezultat').innerHTML = '';
+                    document.getElementById('rezultat').appendChild(tabela);
+                    document.getElementById('rezultat').style.display = 'block';
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
+        // Butonul 2 pentru a prelucra datele de la /activity
+        document.getElementById('buton2').addEventListener('click', () => {
+            fetch(adrese.activity)
+                .then(response => response.json())
+                .then(data => {
+                    const tabela = document.createElement('table');
+                    tabela.innerHTML = `
+                    <tr>
+                        <th>User ID</th>
+                        <th>Username</th>
+                        <th>Numar comentarii</th>
+                        <th>Numar anunturi</th>
+                    </tr>
+                `;
+
+                    data.items.forEach(item => {
+                        const rand = document.createElement('tr');
+                        rand.innerHTML = `
+                        <td>${item.user_id}</td>
+                        <td>${item.username}</td>
+                        <td>${item.num_comments}</td>
+                        <td>${item.num_anunturi}</td>
+                    `;
+                        tabela.appendChild(rand);
+                    });
+
+                    document.getElementById('rezultat').innerHTML = '';
+                    document.getElementById('rezultat').appendChild(tabela);
+                    document.getElementById('rezultat').style.display = 'block';
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
+        document.getElementById('buton3').addEventListener('click', () => {
+            fetch(adrese.car_det)
+                .then(response => response.json())
+                .then(data => {
+                    const tabela = document.createElement('table');
+                    tabela.innerHTML = `
+                    <tr>
+                        <th>Producător</th>
+                        <th>Total anunțuri</th>
+                        <th>Kilometraj mediu</th>
+                        <th>Kilometraj minim</th>
+                        <th>Kilometraj maxim</th>
+                    </tr>
+                `;
+
+                    data.items.forEach(item => {
+                        const rand = document.createElement('tr');
+                        rand.innerHTML = `
+                        <td>${item.manufacturer}</td>
+                        <td>${item.total_anunturi}</td>
+                        <td>${item.avg_kilometers}</td>
+                        <td>${item.min_kilometers}</td>
+                        <td>${item.max_kilometers}</td>
+                    `;
+                        tabela.appendChild(rand);
+                    });
+
+                    const rezultatDiv = document.getElementById('rezultat');
+                    rezultatDiv.innerHTML = '';
+                    rezultatDiv.appendChild(tabela);
+                    rezultatDiv.style.display = 'block';
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
+        document.getElementById('buton4').addEventListener('click', () => {
+            fetch(adrese.user_car_det)
+                .then(response => response.json())
+                .then(data => {
+                    const tabela = document.createElement('table');
+                    tabela.innerHTML = `
+                    <tr>
+                        <th>Utilizator</th>
+                        <th>Total anunțuri</th>
+                        <th>Kilometraj mediu</th>
+                        <th>Anul mașinii</th>
+                    </tr>
+                `;
+
+                    data.items.forEach(item => {
+                        const rand = document.createElement('tr');
+                        rand.innerHTML = `
+                        <td>${item.username}</td>
+                        <td>${item.num_anunturi}</td>
+                        <td>${item.avg_kilometers}</td>
+                        <td>${item.latest_car_year}</td>
+                    `;
+                        tabela.appendChild(rand);
+                    });
+
+                    const rezultatDiv = document.getElementById('rezultat');
+                    rezultatDiv.innerHTML = '';
+                    rezultatDiv.appendChild(tabela);
+                    rezultatDiv.style.display = 'block';
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
+
+    </script>
+</body>
+
+</html>
