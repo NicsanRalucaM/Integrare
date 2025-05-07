@@ -1,0 +1,34 @@
+CREATE ROLE post_admin WITH
+	LOGIN
+	NOSUPERUSER
+	NOCREATEDB
+	NOCREATEROLE
+	INHERIT
+	NOREPLICATION
+	CONNECTION LIMIT -1
+	PASSWORD 'password';
+	
+CREATE SCHEMA posts
+    AUTHORIZATION post_admin;
+
+
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA posts TO post_admin;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
